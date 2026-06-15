@@ -1,17 +1,6 @@
 // lib/cellartracker.ts
 import type { SyncResponse, Wine } from '@/types/wine';
 
-const CT_COLUMNS = [
-  'iWine', 'Vintage', 'Wine', 'Locale', 'Country', 'Region', 'Appellation',
-  'Producer', 'Type', 'Color', 'Category', 'Varietal', 'MasterVarietal',
-  'Designation', 'Vineyard', 'iWines', 'Size', 'Price', 'Valuation',
-  'ChangePct', 'BeginConsume', 'EndConsume', 'CT', 'MyPrice', 'WA', 'WS',
-  'AD', 'DC', 'JH', 'Jeb', 'RP', 'Bin', 'Quantity', 'Pending',
-  'InBasement', 'IN', 'iuser',
-] as const;
-
-type CtRow = Record<typeof CT_COLUMNS[number], string>;
-
 export function buildExportUrl(username: string): string {
   return `https://www.cellartracker.com/list.asp?iUserOverride=${username}&Table=List&fInStock=1&format=tab`;
 }

@@ -1,5 +1,5 @@
 // lib/__tests__/claude.test.ts
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { buildPairingPrompt, parsePairingResponse } from '../claude';
 import type { Wine } from '@/types/wine';
 

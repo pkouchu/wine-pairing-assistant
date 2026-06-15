@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Playwright fixtures use a `use` callback that triggers false-positive React hook warnings.
+  {
+    files: ['tests/**'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
 ]);
 
 export default eslintConfig;
