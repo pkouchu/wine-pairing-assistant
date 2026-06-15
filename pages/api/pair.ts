@@ -25,14 +25,15 @@ export default async function handler(
   }
 
   const username = process.env['CELLARTRACKER_USERNAME'];
-  if (!username) {
+  const password = process.env['CELLARTRACKER_PASSWORD'];
+  if (!username || !password) {
     return res.status(503).json({ error: 'cellartracker_unavailable' });
   }
 
   let inventory = isTestMode ? undefined : inventoryCache.get();
   if (!inventory) {
     try {
-      inventory = await fetchCellarInventory(username);
+      inventory = await fetchCellarInventory(username, password);
       if (!isTestMode && inventory.wines.length > 0) {
         inventoryCache.set(inventory);
       }

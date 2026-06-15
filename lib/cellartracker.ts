@@ -1,8 +1,8 @@
 // lib/cellartracker.ts
 import type { SyncResponse, Wine } from '@/types/wine';
 
-export function buildExportUrl(username: string): string {
-  return `https://www.cellartracker.com/list.asp?iUserOverride=${username}&Table=List&fInStock=1&format=tab`;
+export function buildExportUrl(username: string, password: string): string {
+  return `https://www.cellartracker.com/list.asp?User=${encodeURIComponent(username)}&Password=${encodeURIComponent(password)}&Table=List&fInStock=1&format=tab`;
 }
 
 export function parseTabExport(raw: string): SyncResponse {
@@ -57,8 +57,8 @@ export function parseTabExport(raw: string): SyncResponse {
   return { wines, skipped };
 }
 
-export async function fetchCellarInventory(username: string): Promise<SyncResponse> {
-  const url = buildExportUrl(username);
+export async function fetchCellarInventory(username: string, password: string): Promise<SyncResponse> {
+  const url = buildExportUrl(username, password);
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`cellartracker_unavailable: ${res.status}`);

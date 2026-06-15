@@ -7,6 +7,9 @@ import type { SyncResponse, ApiError } from '@/types/wine';
 const ONE_HOUR = 60 * 60 * 1000;
 const cache = createCache<SyncResponse>(ONE_HOUR);
 
+// In testmode, skip the in-memory cache so each test gets a fresh fetch.
+const isTestMode = !!process.env['NEXT_PRIVATE_TEST_PROXY'];
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SyncResponse | ApiError>
@@ -15,17 +18,18 @@ export default async function handler(
     return res.status(405).json({ error: 'cellartracker_unavailable' });
   }
 
-  const cached = cache.get();
+  const cached = isTestMode ? null : cache.get();
   if (cached) return res.status(200).json(cached);
 
   const username = process.env['CELLARTRACKER_USERNAME'];
-  if (!username) {
+  const password = process.env['CELLARTRACKER_PASSWORD'];
+  if (!username || !password) {
     return res.status(503).json({ error: 'cellartracker_unavailable' });
   }
 
   try {
-    const data = await fetchCellarInventory(username);
-    cache.set(data);
+    const data = await fetchCellarInventory(username, password);
+    if (!isTestMode) cache.set(data);
     return res.status(200).json(data);
   } catch {
     return res.status(503).json({ error: 'cellartracker_unavailable' });
