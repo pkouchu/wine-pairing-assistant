@@ -1,6 +1,8 @@
 // pages/api/sync.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { fetchCellarInventory } from '@/lib/cellartracker';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { parseTabExport } from '@/lib/cellartracker';
 import { createCache } from '@/lib/cache';
 import type { SyncResponse, ApiError } from '@/types/wine';
 
@@ -21,14 +23,10 @@ export default async function handler(
   const cached = isTestMode ? null : cache.get();
   if (cached) return res.status(200).json(cached);
 
-  const username = process.env['CELLARTRACKER_USERNAME'];
-  const password = process.env['CELLARTRACKER_PASSWORD'];
-  if (!username || !password) {
-    return res.status(503).json({ error: 'cellartracker_unavailable' });
-  }
-
   try {
-    const data = await fetchCellarInventory(username, password);
+    const filePath = join(process.cwd(), 'data', 'cellar.csv');
+    const raw = readFileSync(filePath, 'utf-8');
+    const data = parseTabExport(raw);
     if (!isTestMode) cache.set(data);
     return res.status(200).json(data);
   } catch {

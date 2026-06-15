@@ -1,7 +1,9 @@
 // pages/api/pair.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { parseTabExport } from '@/lib/cellartracker';
 import { getPairingSuggestions } from '@/lib/claude';
-import { fetchCellarInventory } from '@/lib/cellartracker';
 import { createCache } from '@/lib/cache';
 import type { PairingResult, ApiError, SyncResponse } from '@/types/wine';
 
@@ -24,16 +26,12 @@ export default async function handler(
     return res.status(400).json({ error: 'no_inventory' });
   }
 
-  const username = process.env['CELLARTRACKER_USERNAME'];
-  const password = process.env['CELLARTRACKER_PASSWORD'];
-  if (!username || !password) {
-    return res.status(503).json({ error: 'cellartracker_unavailable' });
-  }
-
   let inventory = isTestMode ? undefined : inventoryCache.get();
   if (!inventory) {
     try {
-      inventory = await fetchCellarInventory(username, password);
+      const filePath = join(process.cwd(), 'data', 'cellar.csv');
+      const raw = readFileSync(filePath, 'utf-8');
+      inventory = parseTabExport(raw);
       if (!isTestMode && inventory.wines.length > 0) {
         inventoryCache.set(inventory);
       }

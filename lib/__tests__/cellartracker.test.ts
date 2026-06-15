@@ -64,15 +64,9 @@ describe('parseTabExport', () => {
 
 describe('buildExportUrl', () => {
   it('builds the correct CellarTracker export URL', () => {
-    const url = buildExportUrl('pkouchu', 'secret');
+    const url = buildExportUrl();
     expect(url).toBe(
-      'https://www.cellartracker.com/list.asp?User=pkouchu&Password=secret&Table=List&fInStock=1&format=tab'
+      'https://www.cellartracker.com/list.asp?Table=List&fInStock=1&format=tab'
     );
-  });
-
-  it('URL-encodes special characters in credentials', () => {
-    const url = buildExportUrl('user@test', 'p@ss w0rd');
-    expect(url).toContain('User=user%40test');
-    expect(url).toContain('Password=p%40ss%20w0rd');
   });
 });
